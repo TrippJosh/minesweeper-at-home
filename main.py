@@ -6,13 +6,13 @@ import pygame
 pygame.init()
 
 res = (720,720)
-screen = pygame.display.set_mode()
+screen = pygame.display.set_mode(res)
 white = (210, 210, 210)
 grey = (170, 170, 170)
 darkGrey = (100, 100, 100)
 
-width = screen.get_width
-height = screen.get_height
+width = screen.get_width()
+height = screen.get_height()
 smallfont = pygame.font.SysFont('Corbel',35)
 text = smallfont.render('quit' ,True, white)
 
