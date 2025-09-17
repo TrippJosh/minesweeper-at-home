@@ -4,6 +4,7 @@ import sys
 import pygame
 
 pygame.init()
+running = True
 
 res = (720,720)
 screen = pygame.display.set_mode(res)
@@ -46,3 +47,16 @@ def genAlgorithm():
     
     finally:
         print("World generation complete")
+
+##important stuff here not usable until integrated
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    screen.fill(grey)  # Fill background
+    screen.blit(text, (10, 10))  # Draw the "quit" text
+    pygame.display.flip()  # Update the display
+
+pygame.quit()
