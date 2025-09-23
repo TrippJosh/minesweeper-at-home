@@ -1,6 +1,10 @@
 import random
 import time
 
+def printS(text):
+    print(text)
+    time.sleep(1)
+
 def genAlgorithm():
     """generates numbers for the amount of nearby mines"""
     try:
@@ -31,3 +35,27 @@ def genAlgorithm():
     
     finally:
         print("World generation complete")
+        return mineNum
+
+printS("Josh's Minesweeper")
+size = int(input("Enter size of board (5-20): "))
+playing = True
+
+mineTotal = size * size
+results = []
+revealed = []
+while temp != 0:
+    temp -= 1
+    results.append(genAlgorithm())
+
+while playing == True:
+    counter = size
+    while counter != 0:
+        #print from results list until counter (aka size) is 0, finish later
+        print("filler")
+    #show screen
+
+    userInput = input("-> ")
+    cmd, arg = userInput.split()
+    col = ord(arg[0].lower()) - ord('a')
+    row = int(arg[1:]) - 1
