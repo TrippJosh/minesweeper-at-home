@@ -44,7 +44,7 @@ playing = True
 mineTotal = size * size
 results = []
 revealed = []
-while temp != 0:
+while mineTotal != 0:
     temp -= 1
     results.append(genAlgorithm())
 
