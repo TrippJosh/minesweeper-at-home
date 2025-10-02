@@ -19,18 +19,27 @@ COLORS = {
 RESET = "\033[0m"
 
 def printS(text):
+    """
+    Prints the given text and pauses for 1 second for dramatic effect.
+    """
     print(text)
     time.sleep(1)
 
 def color_cell(cell):
-    """"recallable number coloring function"""
+    """
+    Returns the cell value as a colored string if it is a number (1-8), otherwise returns the cell as a string.
+    Used for colored Minesweeper board display.
+    """
     cell_str = str(cell)
     if cell_str in COLORS:
         return f"{COLORS[cell_str]}{cell_str}{RESET}"
     return cell_str
 
 def genAlgorithm():
-    """generates, randomly, whether or not a mine is at a space"""
+    """
+    Randomly determines if a mine is placed at a grid location.
+    Returns 1 for mine, 0 for empty.
+    """
     try:
         temp = random.randint(1, 100)
         if temp < 34:
@@ -45,7 +54,10 @@ def genAlgorithm():
         return mineNum
     
 def flag(row, col):
-    """handles flagging"""
+    """
+    Flags or unflags a tile at the given row and column.
+    Flags if unrevealed, unflags if already flagged, prevents flagging revealed tiles.
+    """
     try:
             if revealed[row][col] == 'F':
                 print(f"Unflagging at {row}, {col}")
@@ -61,7 +73,11 @@ def flag(row, col):
 first_click = True
 
 def click(row, col):
-    """handles clicking process"""
+    """
+    Handles clicking on a tile at the given row and column.
+    Reveals the tile, counts nearby mines, and reveals adjacent tiles on first click.
+    Prevents clicking flagged tiles and handles game over logic.
+    """
     try:
         global first_click, playing
         print(f"Clicking at {col+1}, {row+1}")
@@ -112,6 +128,7 @@ def click(row, col):
         print("Error processing click command.")
 
 #startup/intro sequence
+print(f"{reset}---{reset}")
 printS(f"{blue}Josh's Minesweeper{blue}")
 size = int(input("Enter size of board (5-20): "))
 debugQ = input("Enable debug mode? (y/n): ").lower()
@@ -185,12 +202,21 @@ print(f"{reset}Legend: F = Flagged, . = Unrevealed, Numbers = mines nearby{reset
 while playing == True:
     try:
         if all(revealed[r][c] != "." and revealed[r][c] != 'F' for r in range(size) for c in range(size) if grid[r][c] == 0):
-            print("{gold}Congratulations! You've cleared the board!{gold}")
+            print(f"{gold}---{gold}")
+            printS("      ___________      ")
+            printS("     '._==_==_=_.'     ")
+            printS("     .-\\:      /-.    ")
+            printS("    | (|:.     |) |    ")
+            printS("     '-|:.     |-'     ")
+            printS("       \\::.    /      ")
+            printS("        '::. .'        ")
+            printS("          ) (          ")
+            print(f"{gold}Congratulations! You've cleared the board!{gold}")
             question = input("Would you like to play again? (y/n): ").lower()
+            print(f"{reset}---{reset}")
             if question == 'y':
                 import os
                 os.execv(sys.executable, ['python'] + sys.argv)
-                print("{reset}---{reset}")
             else:
                 break
         print("Current Board:")
