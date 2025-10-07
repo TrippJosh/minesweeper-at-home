@@ -18,12 +18,45 @@ COLORS = {
 }
 RESET = "\033[0m"
 
+def readScores():
+    """
+    Reads and returns the contents of the scores.txt file.
+    """
+    try:
+        with open("scores.txt", "r") as file:
+            lines = [line.strip() for line in file if line.strip()]
+            scores = []
+            for i in range(0, len(lines), 2):
+                if i + 1 < len(lines):
+                    entry = f"{lines[i]} - {lines[i+1]}"
+                    scores.append(entry)
+            if scores:
+                return scores[:5]
+            else:
+                return "No scores available."
+    except FileNotFoundError:
+        return "No scores available."
+
+def writeScores(name, score):
+    """
+    Appends the given text to the scores.txt file.
+    """
+    try:
+        with open("scores.txt", "a") as file:
+            file.write(name)
+            file.write(score)
+            file.write("\n")
+    except Exception as e:
+        print(f"Error writing to scores file: {e}")
+    finally:
+        file.close()
+
 def printS(text):
     """
-    Prints the given text and pauses for 1 second for dramatic effect.
+    Prints the given text and pauses for half a second for dramatic effect.
     """
     print(text)
-    time.sleep(1)
+    time.sleep(0.5)
 
 def color_cell(cell):
     """
@@ -47,8 +80,12 @@ def genAlgorithm():
         else:
             mineNum = 0
 
-    except:
-        print("Error in world generation algorithm!")
+    except ValueError:
+        print("ValueError in world generation algorithm!")
+    except TypeError:
+        print("TypeError in world generation algorithm!")
+    except Exception:
+        print("Unknown error in world generation algorithm!")
     
     finally:
         return mineNum
@@ -67,8 +104,10 @@ def flag(row, col):
                 revealed[row][col] = 'F'
             else:
                 print("Cannot flag a revealed tile.")
-    except:
-        print("Error processing flag command.")
+    except IndexError:
+        print("IndexError: Invalid flag coordinates.")
+    except Exception:
+        print("Unknown error processing flag command.")
 
 first_click = True
 
@@ -124,16 +163,33 @@ def click(row, col):
                                 revealed[nr][nc] = neighbor_mines
                 first_click = False
         print("")
-    except:
-        print("Error processing click command.")
+    except IndexError:
+        print("IndexError: Invalid click coordinates.")
+    except ValueError:
+        print("ValueError: Invalid value during click.")
+    except Exception:
+        print("Unknown error processing click command.")
 
 #startup/intro sequence
 print(f"{reset}---{reset}")
 printS(f"{blue}Josh's Minesweeper{blue}")
-size = int(input("Enter size of board (5-20): "))
+printS("By Josh (github.com/joshua-goulding)")
+
+printS("\n Current High Scores (top 5):")
+printS(readScores())
+
+asking = True
+while asking == True:
+    size = int(input("Enter size of board (Min. 5): "))
+    if 5 > size:
+        print("Size too small, there will be a map generation error.")
+    else:
+        asking = False
+
 debugQ = input("Enable debug mode? (y/n): ").lower()
 print("Pro tip: the only commands are 'flag' and 'click', followed by the coordinates (e.g. 'flag 23' or 'click 25')")
 print("Another pro tip: you can't unflag a tile. Be careful where you place them.")
+
 if debugQ == 'y':
     debug = True
 else:
@@ -183,8 +239,11 @@ while foundEmpty != 0: # finds an empty space to start the game, thrice
             startRow += 1
         else:
             startCol += 1
-    except:
-        print("Error finding starting position.")
+    except IndexError:
+        print("IndexError: Error finding starting position.")
+        break
+    except Exception:
+        print("Unknown error finding starting position.")
         break
 
 if debug == True:
@@ -193,7 +252,7 @@ if debug == True:
         print("Mine grid:")
         for row in grid:
             print(' '.join(str(cell) for cell in row))
-    except:
+    except Exception:
         print("Error displaying debug information.")
 
 ##legend
@@ -212,6 +271,10 @@ while playing == True:
             printS("        '::. .'        ")
             printS("          ) (          ")
             print(f"{gold}Congratulations! You've cleared the board!{gold}")
+            scoreName = input("Enter your name for the high score list: ")
+
+            writeScores(scoreName, f" - {size}x{size} board cleared")
+
             question = input("Would you like to play again? (y/n): ").lower()
             print(f"{reset}---{reset}")
             if question == 'y':
@@ -235,6 +298,12 @@ while playing == True:
             flag(row, col)
         elif cmd == "click":
             click(row, col)
-    except:
-        print("Unknown command")
+    except ValueError:
+        print("ValueError: Invalid input. Please enter a valid command and coordinates.")
+    except IndexError:
+        print("IndexError: Invalid coordinates. Please enter coordinates within the board size.")
+    except KeyError:
+        print("KeyError: Invalid command. Use 'flag' or 'click'.")
+    except Exception:
+        print("Unknown error occurred while processing command.")
     
