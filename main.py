@@ -24,16 +24,23 @@ def readScores():
     """
     try:
         with open("scores.txt", "r") as file:
-            lines = [line.strip() for line in file if line.strip()]
-            scores = []
-            for i in range(0, len(lines), 2):
-                if i + 1 < len(lines):
-                    entry = f"{lines[i]} - {lines[i+1]}"
-                    scores.append(entry)
-            if scores:
-                return scores[:5]
-            else:
-                return "No scores available."
+            lines = []
+            reading = True
+            while reading == True:
+                tempLine = file.readline()
+                if tempLine == "":
+                    reading = False
+                    break
+                else:
+                    lines.append(tempLine)
+            
+            linesSorted = sorted(lines, reverse=True)[:5]
+
+            ##debug print(lines)
+            for i in linesSorted:
+                print(i.strip())
+            print("")
+            
     except FileNotFoundError:
         return "No scores available."
 
@@ -43,8 +50,7 @@ def writeScores(name, score):
     """
     try:
         with open("scores.txt", "a") as file:
-            file.write(name)
-            file.write(score)
+            file.write(name, score)
             file.write("\n")
     except Exception as e:
         print(f"Error writing to scores file: {e}")
@@ -180,11 +186,14 @@ printS(readScores())
 
 asking = True
 while asking == True:
-    size = int(input("Enter size of board (Min. 5): "))
-    if 5 > size:
-        print("Size too small, there will be a map generation error.")
-    else:
-        asking = False
+    try:
+        size = int(input("Enter size of board (Min. 5): "))
+        if 5 > size:
+            print("Size too small, there will be a map generation error.")
+        else:
+            asking = False
+    except ValueError:
+        print("Please enter a valid integer for the board size.")
 
 debugQ = input("Enable debug mode? (y/n): ").lower()
 print("Pro tip: the only commands are 'flag' and 'click', followed by the coordinates (e.g. 'flag 23' or 'click 25')")
@@ -271,9 +280,9 @@ while playing == True:
             printS("        '::. .'        ")
             printS("          ) (          ")
             print(f"{gold}Congratulations! You've cleared the board!{gold}")
-            scoreName = input("Enter your name for the high score list: ")
+            scoreName = input("Enter your name (no spaces please) for the high score list: ")
 
-            writeScores(scoreName, f" - {size}x{size} board cleared")
+            writeScores(scoreName, size)
 
             question = input("Would you like to play again? (y/n): ").lower()
             print(f"{reset}---{reset}")
@@ -307,3 +316,4 @@ while playing == True:
     except Exception:
         print("Unknown error occurred while processing command.")
     
+############### end of game loop
