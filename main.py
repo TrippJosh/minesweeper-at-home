@@ -49,11 +49,13 @@ def writeScores(name, score):
     Appends the given text to the scores.txt file.
     """
     try:
+        compound = str("\n" + str(score) + " " + name)
         with open("scores.txt", "a") as file:
-            file.write(name, score)
+            file.write(compound)
             file.write("\n")
     except Exception as e:
-        print(f"Error writing to scores file: {e}")
+        if debug == True:
+            print(f"Error writing to scores file: {e}")
     finally:
         file.close()
 
@@ -87,11 +89,14 @@ def genAlgorithm():
             mineNum = 0
 
     except ValueError:
-        print("ValueError in world generation algorithm!")
+        if debug == True:
+            print("ValueError in world generation algorithm!")
     except TypeError:
-        print("TypeError in world generation algorithm!")
+        if debug == True:
+            print("TypeError in world generation algorithm!")
     except Exception:
-        print("Unknown error in world generation algorithm!")
+        if debug == True:
+            print("Unknown error in world generation algorithm!")
     
     finally:
         return mineNum
@@ -111,9 +116,11 @@ def flag(row, col):
             else:
                 print("Cannot flag a revealed tile.")
     except IndexError:
-        print("IndexError: Invalid flag coordinates.")
+        if debug == True:
+            print("IndexError: Invalid flag coordinates.")
     except Exception:
-        print("Unknown error processing flag command.")
+        if debug == True:
+            print("Unknown error processing flag command.")
 
 first_click = True
 
@@ -170,13 +177,16 @@ def click(row, col):
                 first_click = False
         print("")
     except IndexError:
-        print("IndexError: Invalid click coordinates.")
+        if debug == True:
+            print("IndexError: Invalid click coordinates.")
     except ValueError:
-        print("ValueError: Invalid value during click.")
+        if debug == True:
+            print("ValueError: Invalid value during click.")
     except Exception:
-        print("Unknown error processing click command.")
+        if debug == True:
+            print("Unknown error processing click command.")
 
-#startup/intro sequence
+#####################################################################startup/intro sequence
 print(f"{reset}---{reset}")
 printS(f"{blue}Josh's Minesweeper{blue}")
 printS("By Josh (github.com/joshua-goulding)")
@@ -195,14 +205,9 @@ while asking == True:
     except ValueError:
         print("Please enter a valid integer for the board size.")
 
-debugQ = input("Enable debug mode? (y/n): ").lower()
-print("Pro tip: the only commands are 'flag' and 'click', followed by the coordinates (e.g. 'flag 23' or 'click 25')")
-print("Another pro tip: you can't unflag a tile. Be careful where you place them.")
+print("Pro tip: to see commands, type 'help'.")
+print("Another pro tip: unless your command is flag or click, you must follow it with two 0s (e.g., help 00).")
 
-if debugQ == 'y':
-    debug = True
-else:
-    debug = False
 playing = True
 
 mineTotal = size * size
@@ -255,15 +260,6 @@ while foundEmpty != 0: # finds an empty space to start the game, thrice
         print("Unknown error finding starting position.")
         break
 
-if debug == True:
-    try:
-        print(f"{reset}DEBUG MODE ENABLED{reset}")
-        print("Mine grid:")
-        for row in grid:
-            print(' '.join(str(cell) for cell in row))
-    except Exception:
-        print("Error displaying debug information.")
-
 ##legend
 print(f"{reset}Legend: F = Flagged, . = Unrevealed, Numbers = mines nearby{reset}")
 
@@ -280,7 +276,7 @@ while playing == True:
             printS("        '::. .'        ")
             printS("          ) (          ")
             print(f"{gold}Congratulations! You've cleared the board!{gold}")
-            scoreName = input("Enter your name (no spaces please) for the high score list: ")
+            scoreName = input("Enter your name for the high score list: ")
 
             writeScores(scoreName, size)
 
@@ -300,6 +296,10 @@ while playing == True:
 
         userInput = input("-> ")
         cmd, arg = userInput.split()
+        if cmd != "flag" and cmd != "click":
+            row = 1  # padding for non-flag/click commands
+            col = 1
+            nonCoord = True
         row = int(arg[1]) - 1
         col = int(arg[0]) - 1
 
@@ -307,10 +307,39 @@ while playing == True:
             flag(row, col)
         elif cmd == "click":
             click(row, col)
-    except ValueError:
-        print("ValueError: Invalid input. Please enter a valid command and coordinates.")
+        elif cmd == "exit":
+            print("Exiting game.")
+            break
+        elif cmd == "help":
+            print("Available commands:")
+            print("  flag XY   - Place a flag at coordinates XY (e.g., flag 23)")
+            print("  click XY  - Click the tile at coordinates XY (e.g., click 25)")
+            print("  exit      - Exit the game")
+            if debug == True:
+                print("  debug     - Enable debug mode (secret command)")
+                print("  debugShow - Show the mine grid (debug mode only)")
+                print("  debugStop - Disable debug mode")
+        elif cmd == "debugShow":
+            if debug == True:
+                try:
+                    print(f"{reset}DEBUG MODE ENABLED{reset}")
+                    print("Mine grid:")
+                    for row in grid:
+                        print(' '.join(str(cell) for cell in row))
+                except Exception:
+                        print("Error displaying debug information.")
+        elif cmd == "debug":
+            debug = True
+            print("Debug mode enabled.")
+        elif cmd == "debugStop":
+            if debug == True:
+                debug = False
+                print("Debug mode disabled.")
+            
     except IndexError:
         print("IndexError: Invalid coordinates. Please enter coordinates within the board size.")
+    except ValueError:
+        print("ValueError: Invalid input. Please enter a valid command and coordinates.")
     except KeyError:
         print("KeyError: Invalid command. Use 'flag' or 'click'.")
     except Exception:
