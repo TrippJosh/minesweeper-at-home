@@ -186,7 +186,7 @@ def click(row, col):
         if debug == True:
             print("Unknown error processing click command.")
 
-#####################################################################startup/intro sequence
+#################################################################################################startup/intro sequence
 print(f"{reset}---{reset}")
 printS(f"{blue}Josh's Minesweeper{blue}")
 printS("By Josh (github.com/joshua-goulding)")
@@ -206,7 +206,6 @@ while asking == True:
         print("Please enter a valid integer for the board size.")
 
 print("Pro tip: to see commands, type 'help'.")
-print("Another pro tip: unless your command is flag or click, you must follow it with two 0s (e.g., help 00).")
 
 playing = True
 
@@ -295,11 +294,11 @@ while playing == True:
             print(f"{str(idx+1).rjust(2)} " + ' '.join(color_cell(cell) for cell in row))
 
         userInput = input("-> ")
+        noCoordCmds = ["help", "exit", "debug", "debugShow", "debugStop"]
+        for command in noCoordCmds:
+            if command == userInput:
+                userInput = userInput + " 00"  # padding for no-coordinate commands
         cmd, arg = userInput.split()
-        if cmd != "flag" and cmd != "click":
-            row = 1  # padding for non-flag/click commands
-            col = 1
-            nonCoord = True
         row = int(arg[1]) - 1
         col = int(arg[0]) - 1
 
