@@ -54,8 +54,9 @@ def writeScores(name, timeScore, sizeScore):
     Appends the given text to the scores.txt file.
     """
     try:
-        compound = str("Size:" + str(sizeScore) + " Score:" + str(timeScore) + " Name:" + name)
-        with open("scores.txt", "a") as file:
+        compound = str("Size: " + str(sizeScore) + " Score: " + str(timeScore) + " Name: " + name)
+        with open("scores.txt", "a+") as file:
+            waste = file.readline()  # to move cursor to end of file
             file.write(compound)
             file.write("\n")
     except Exception as e:
@@ -286,6 +287,8 @@ while playing == True:
         if all(revealed[r][c] != "." and revealed[r][c] != 'F' for r in range(size) for c in range(size) if grid[r][c] == 0) or debugWin == True:
             end = time.time()
             timer = int(end - start)
+            if timer > 9999:
+                timer = 9999
             scoreTimer = 10000 - timer
             print(f"{gold}---{gold}")
             printS("      ___________      ")
@@ -317,7 +320,7 @@ while playing == True:
             print(f"{str(idx+1).rjust(2)} " + ' '.join(color_cell(cell) for cell in row))
 
         userInput = input("-> ")
-        noCoordCmds = ["help", "exit", "debug", "debugShow", "debugStop"]
+        noCoordCmds = ["help", "exit", "debug", "debugShow", "debugStop", "debugWin"]
         for command in noCoordCmds:
             if command == userInput:
                 userInput = userInput + " 00"  # padding for no-coordinate commands
