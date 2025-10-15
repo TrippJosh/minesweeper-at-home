@@ -1,10 +1,15 @@
 import random
 import time
 import sys
+import time
 
 blue = "\033[34m"
 reset = "\033[0m"
 gold = "\033[38;5;220m"
+
+probRow = 0
+probCol = 0
+debugWin = False
 
 COLORS = {
     '1': "\033[34m",  # Blue
@@ -44,12 +49,12 @@ def readScores():
     except FileNotFoundError:
         return "No scores available."
 
-def writeScores(name, score):
+def writeScores(name, timeScore, sizeScore):
     """
     Appends the given text to the scores.txt file.
     """
     try:
-        compound = str("\n" + str(score) + " " + name)
+        compound = str("Size:" + str(sizeScore) + " Score:" + str(timeScore) + " Name:" + name)
         with open("scores.txt", "a") as file:
             file.write(compound)
             file.write("\n")
@@ -76,14 +81,26 @@ def color_cell(cell):
         return f"{COLORS[cell_str]}{cell_str}{RESET}"
     return cell_str
 
-def genAlgorithm():
+def genAlgorithm(posRow=probRow, posCol=probCol):
     """
     Randomly determines if a mine is placed at a grid location.
     Returns 1 for mine, 0 for empty.
     """
     try:
+        additionalProb = 0
+        for dr in [-1, 0, 1]:
+            for dc in [-1, 0, 1]:
+                if dr == 0 and dc == 0:
+                    continue
+                nr, nc = posRow + dr, posCol + dc
+                if 0 <= nr < size and 0 <= nc < size:
+                    if grid[nr][nc] == 1:
+                        additionalProb += 1
         temp = random.randint(1, 100)
-        if temp < 34:
+        temp += additionalProb * 10  # increase chance of mine if neighbors have mines
+        if temp >= 98:
+            mineNum = 1
+        elif temp <= 25:
             mineNum = 1
         else:
             mineNum = 0
@@ -208,6 +225,8 @@ while asking == True:
 print("Pro tip: to see commands, type 'help'.")
 
 playing = True
+start = time.time() 
+debug = False
 
 mineTotal = size * size
 rowCounter = 0
@@ -264,7 +283,10 @@ print(f"{reset}Legend: F = Flagged, . = Unrevealed, Numbers = mines nearby{reset
 
 while playing == True:
     try:
-        if all(revealed[r][c] != "." and revealed[r][c] != 'F' for r in range(size) for c in range(size) if grid[r][c] == 0):
+        if all(revealed[r][c] != "." and revealed[r][c] != 'F' for r in range(size) for c in range(size) if grid[r][c] == 0) or debugWin == True:
+            end = time.time()
+            timer = int(end - start)
+            scoreTimer = 10000 - timer
             print(f"{gold}---{gold}")
             printS("      ___________      ")
             printS("     '._==_==_=_.'     ")
@@ -275,9 +297,10 @@ while playing == True:
             printS("        '::. .'        ")
             printS("          ) (          ")
             print(f"{gold}Congratulations! You've cleared the board!{gold}")
+            print("It only took you " + str(timer) + " seconds!")
             scoreName = input("Enter your name for the high score list: ")
 
-            writeScores(scoreName, size)
+            writeScores(scoreName, scoreTimer, size )
 
             question = input("Would you like to play again? (y/n): ").lower()
             print(f"{reset}---{reset}")
@@ -334,6 +357,10 @@ while playing == True:
             if debug == True:
                 debug = False
                 print("Debug mode disabled.")
+        elif cmd == "debugWin":
+            if debug == True:
+                debugWin = True
+                print("Debug win enabled.")
             
     except IndexError:
         print("IndexError: Invalid coordinates. Please enter coordinates within the board size.")
@@ -343,5 +370,6 @@ while playing == True:
         print("KeyError: Invalid command. Use 'flag' or 'click'.")
     except Exception:
         print("Unknown error occurred while processing command.")
+        break
     
 ############### end of game loop
