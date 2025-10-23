@@ -176,7 +176,7 @@ def click(row, col):
 
             revealed[row][col] = displayNum
 
-            if first_click:
+            if first_click or displayNum == 0:
                 for dr in [-1, 0, 1]:
                     for dc in [-1, 0, 1]:
                         nr, nc = row + dr, col + dc
