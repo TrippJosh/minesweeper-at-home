@@ -10,6 +10,7 @@ gold = "\033[38;5;220m"
 probRow = 0
 probCol = 0
 debugWin = False
+debugFlag = False
 
 COLORS = {
     '1': "\033[34m",  # Blue
@@ -301,9 +302,16 @@ while playing == True:
             printS("          ) (          ")
             print(f"{gold}Congratulations! You've cleared the board!{gold}")
             print("It only took you " + str(timer) + " seconds!")
-            scoreName = input("Enter your name for the high score list: ")
+            if debugFlag == False:
+                scoreName = input("Enter your name for the high score list: ")
 
-            writeScores(scoreName, scoreTimer, size )
+                writeScores(scoreName, scoreTimer, size )
+            elif debugWin == True:
+                print("Debug win - score not recorded.")
+            elif debugFlag == True:
+                print("Debug mode active - score not recorded.")
+            else:
+                print("Score not recorded due to unknown reason.")
 
             question = input("Would you like to play again? (y/n): ").lower()
             print(f"{reset}---{reset}")
@@ -356,6 +364,7 @@ while playing == True:
         elif cmd == "debug":
             debug = True
             print("Debug mode enabled.")
+            debugFlag = True
         elif cmd == "debugStop":
             if debug == True:
                 debug = False
